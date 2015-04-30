@@ -5,7 +5,7 @@
 //                                                          //
 //==========================================================//
 
-#include <avr/pgmspace.h>
+//#include <avr/pgmspace.h>
 #include <Wire.h>
 //---------------FONT + GRAPHIC-----------------------------//
 #include "data.h"
@@ -13,15 +13,21 @@
 
 // OLED I2C bus address
 #define OLED_address  0x3c
+//static int d0 = 0;
 
-int PWR_ON = 0;  //Using Pin 0 tp power the oleds VCC
+const int PWR_ON = 0;  //Using Pin 0 tp power the oleds VCC
 
 void setup()
 {
+  //pinMode(PWR_ON, INPUT_PULLUP);  
   pinMode(PWR_ON, OUTPUT); 
+  digitalWrite(PWR_ON, HIGH); 
+  delay(1000);  //Needed!
+   
   // Initialize I2C and OLED Display
   Wire.begin();
   init_OLED();
+  delay(1500);
   reset_display();           // Clear logo and load saved mode
 }
 
@@ -33,13 +39,11 @@ void loop()
   char ab[]= "****";
   uint16_t batteryV = 0;
   char tmp[5];
-  
-   digitalWrite(PWR_ON, HIGH); 
-   displayOn();
+   
+  displayOn();
 
    while(1)
-   {
-    digitalWrite(PWR_ON, HIGH); 
+   {  
     clear_display();
     sendStrXY("Temp:",0,4);
     float temperature = Bean.getTemperature();
@@ -53,7 +57,7 @@ void loop()
     sendStrXY("%",5,6);
     
     delay(5000);
-    reset_display();
+    //reset_display();
     
     //digitalWrite(PWR_ON, LOW); //Display EN Off
     //Bean.sleep(2);
@@ -299,11 +303,11 @@ static void init_OLED(void)
   //  sendcommand(0x02);         // Set Memory Addressing Mode ab Page addressing mode(RESET)  
   
    setXY(0,0);
-  /*
+  
   for(int i=0;i<128*8;i++)     // show 128* 64 Logo
   {
     SendChar(pgm_read_byte(logo+i));
   }
-  */
+  
   sendcommand(0xaf);		//display on
 }
